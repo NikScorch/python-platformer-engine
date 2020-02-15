@@ -2,7 +2,7 @@
 
 import pygame
 from pygame.locals import *
-import subprocess
+import os
 #from __main__ import platforms
 platforms = []
 checkpoints = []
@@ -94,8 +94,7 @@ class platform:
 			self.PosXY[1] += 10
 
 	def spriteAnimation(self, spriteFolder, mode):
-		frames = subprocess.getoutput("ls " + spriteFolder)
-		frames = frames.split("\n")
+		frames = os.listdir(spriteFolder)
 		if mode == "animation":
 			self.spriteTick += 1
 			if self.spriteState == len(frames):
