@@ -151,4 +151,5 @@ class regionPoint:
 	def __init__(self, PosX, PosY):
 		self.PosXY = [PosX, PosY]
 		self.hitbox = pygame.Surface((25, 25))
+		self.Collected = False
 		regionpoints.append(self)

@@ -16,6 +16,7 @@ font = pygame.font.Font(None, 30)
 ## Variables
 resetOriginalPos = 0
 levelHeight = 0
+TotalRP = 0
 timeBar = progressBar(60)
 # Display
 sFullscreen = False
@@ -86,9 +87,14 @@ while running:
 	screen.blit(regionpoints[0].hitbox, regionpoints[0].PosXY)
 
 	fps = font.render(str("FPS:"), True, (100, 100, 100))
-	fpsNum = font.render(str(int(clock.get_fps())), True, (100,100,100))
+	fpsNum = font.render(str(int(clock.get_fps())), True, (100, 100, 100))
 	screen.blit(fps, (50, 50))
 	screen.blit(fpsNum, (100, 50))
+
+	rp = font.render(str("RP: "), True, (100, 100, 100))
+	rpNum = font.render(str(TotalRP), True, (100, 100, 100))
+	screen.blit(rp, (50, 75))
+	screen.blit(rpNum, (100, 75))
 
 	clock.tick(globalTick)
 	pygame.display.update()
@@ -244,6 +250,12 @@ while running:
 						regionpoints[0].PosXY[0] -= lift
 						resetOriginalPos -= lift
 
+	# Detect new region points and update counter
+	for i in range(len(regionpoints)):
+		if collision(char, regionpoints[i].hitbox, (PosX, PosY), regionpoints[i].PosXY):
+			if regionpoints[i].Collected == False:
+				TotalRP += 1
+				regionpoints[i].Collected = True
 
 	# Level specific code
 	# Level changer and loading system

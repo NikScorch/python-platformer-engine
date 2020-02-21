@@ -49,7 +49,7 @@ EndWallLedge = platform(25, 25, 1900, 550)
 EndWallLedge.hitbox.fill((100, 100, 255))
 
 EndWallEntrance = platform(25, 50, 1925, 500)
-EndWallEntrance.hitbox.fill((100, 100, 225))
+EndWallEntrance.hitbox.fill((100, 100, 255))
 EndWallEntrance.makeGas()
 EndWallClimb = platform(125, 400, 1950, 150)
 EndWallClimb.hitbox.fill((100, 100, 255))
