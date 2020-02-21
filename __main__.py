@@ -3,6 +3,7 @@
 import pygame
 from pygame.locals import *
 from core import *
+import sys
 
 ## Start pygame
 pygame.init()
@@ -43,7 +44,13 @@ charTick = 0
 
 # Levels
 level = 1
-from levels.testLevel1 import *
+# If level specified use that instead of default
+del sys.argv[0]
+if len(sys.argv) > 0:
+	import importlib
+	module = importlib.import_module(sys.argv[0])
+else:
+	from levels.testLevel1 import *
 
 running = True
 while running:
