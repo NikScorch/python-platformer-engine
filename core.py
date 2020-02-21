@@ -3,9 +3,10 @@
 import pygame
 from pygame.locals import *
 import os
-#from __main__ import platforms
+import sys
 platforms = []
 checkpoints = []
+regionpoints = []
 
 ## Functions
 def collision(obj1, obj2, obj1Pos, obj2Pos):
@@ -73,6 +74,28 @@ def relativeLocation(obj1, obj2, obj1Pos, obj2Pos):
 
 
 ## Classes
+class progressBar:
+	def __init__(self, barLen):
+		# Progress bar using sys.stdout --- a tool to mod text on the fly
+		print("")
+
+		self.barLen = barLen
+		self.progress = 0
+
+		# setup toolbar
+		sys.stdout.write("[%s]" % (" " * self.barLen))
+		sys.stdout.flush()
+		sys.stdout.write("\b" * (self.barLen+1)) # return to start of line, after '['
+
+	def update(self):
+		self.progress += 1
+		# update the bar
+		sys.stdout.write("-")
+		sys.stdout.flush()
+
+		if self.progress == self.barLen:
+			sys.stdout.write("]") # this ends the progress bar
+
 class platform:
 	def __init__(self, LenX, LenY, PosX, PosY):
 		self.LenX = LenX
@@ -82,6 +105,14 @@ class platform:
 		platforms.append(self)
 		self.spriteTick = 0
 		self.spriteState = 0
+		self.physicalState = "Solid" # "Liquid","Gas"
+
+	def makeSolid(self):
+		self.physicalState = "Solid"
+	def makeLiquid(self):
+		self.physicalState = "Liquid"
+	def makeGas(self):
+		self.physicalState = "Gas"
 
 	def movePos(self, direction):
 		if direction == "Right":
@@ -115,3 +146,9 @@ class checkpoint:
 		self.PosXY = [PosX, PosY]
 		self.hitbox = pygame.Surface((25, 25))
 		checkpoints.append(self)
+
+class regionPoint:
+	def __init__(self, PosX, PosY):
+		self.PosXY = [PosX, PosY]
+		self.hitbox = pygame.Surface((25, 25))
+		regionpoints.append(self)

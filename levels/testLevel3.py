@@ -36,8 +36,10 @@ endPlat3 = platform(75, 25, 1700, 350)
 endPlat3.hitbox.fill((100, 100, 255))
 
 # Walls
-wall = platform(250, 475, -100, 125)
+wall = platform(450, 475, -300, 125)
 wall.hitbox.fill((100, 100, 255))
+wall2 = platform(250, 125, -300, 0)
+wall2.hitbox.fill((100, 100, 255))
 
 topCrusher = platform(150, 300, 850, 0)
 topCrusher.hitbox.fill((100, 100, 255))
@@ -52,3 +54,7 @@ barrier2.hitbox.fill((100, 100, 255))
 # Checkpoint
 checkP = checkpoint(1500, 150)
 checkP.hitbox.fill((255, 150, 50))
+
+# Region Point
+regionP = regionPoint(50, 75)
+regionP.hitbox.fill((150, 200, 255))

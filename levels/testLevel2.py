@@ -31,7 +31,7 @@ ceiling = platform(500, 25, 1300, 0)
 ceiling.hitbox.fill((100, 100, 255))
 longCeiling = platform(1000, 25, 800, -25)
 
-hiddenPlat = platform(400, 10, 1400, 500)
+hiddenPlat = platform(350, 10, 1400, 500)
 hiddenPlat.hitbox.fill((250, 250, 250))
 
 # Walls
@@ -43,3 +43,7 @@ wall2.hitbox.fill((100, 100, 255))
 # Checkpoint
 checkP = checkpoint(1700, 75)
 checkP.hitbox.fill((255, 150, 50))
+
+# Region Point
+regionP = regionPoint(1700, 425)
+regionP.hitbox.fill((150, 200, 225))

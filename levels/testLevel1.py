@@ -20,8 +20,18 @@ floatPlat.hitbox.fill((100, 100, 255))
 floatPlat2 = platform(200, 25, 750, 200)
 floatPlat2.hitbox.fill((100, 100, 255))
 
-ceilingBlock = platform(200, 350, 1100, 0)
-ceilingBlock.hitbox.fill((100, 100, 255))
+ceilingBlock1 = platform(25, 350, 1100, 0)
+ceilingBlock1.hitbox.fill((100, 100, 255))
+ceilingBlock2 = platform(25, 350, 1275, 0)
+ceilingBlock2.hitbox.fill((100, 100, 255))
+ceilingBlockTop = platform(150, 250, 1125, 0)
+ceilingBlockTop.hitbox.fill((100, 100, 255))
+ceilingBlockBase = platform(100, 25, 1175, 325)
+ceilingBlockBase.hitbox.fill((100, 100, 255))
+ceilingBlockOpening = platform(50, 100, 1125, 250)
+ceilingBlockOpening.hitbox.fill((100, 100, 255))
+ceilingBlockOpening.makeLiquid()
+
 floorBlock = platform(200, 150 , 1100, 450)
 floorBlock.hitbox.fill((100, 100, 255))
 
@@ -34,3 +44,7 @@ wall.hitbox.fill((100, 100, 255))
 # Checkpoint
 checkP = checkpoint(1550, 300)
 checkP.hitbox.fill((255, 150, 50))
+
+# Region Point
+regionP = regionPoint(1225, 275)
+regionP.hitbox.fill((150, 200, 255))

@@ -6,6 +6,8 @@ from core import *
 
 ## Start pygame
 pygame.init()
+info = pygame.display.Info()
+width, height = (info.current_w, info.current_h)
 screen = pygame.display.set_mode((800,600))
 screen.fill((255,255,255))
 clock = pygame.time.Clock()
@@ -14,10 +16,16 @@ font = pygame.font.Font(None, 30)
 ## Variables
 resetOriginalPos = 0
 levelHeight = 0
-
+timeBar = progressBar(60)
+# Display
+sFullscreen = False
+F11Mode = "enlarge"
+#         "shrink"
+# Game Speed
 globalTick = 40
 currentTick = 0
 currentSecond = 0
+moveMod = 1
 # Movement
 up = False
 down = False
@@ -33,20 +41,29 @@ PosX, PosY = int(250), int(250)
 charTick = 0
 
 # Levels
-platforms = []
-checkpoints = []
 level = 1
 from levels.testLevel1 import *
 
 running = True
 while running:
+	# Game tick and time code
 	if currentTick < globalTick:
 		currentTick += 1
 	if currentTick/globalTick == 1:
 		currentSecond += 1
-		print(currentSecond)
-		currentTick = 0
+		currentTick = 1
+		# Represent game time with progress bars
+		if timeBar.progress == timeBar.barLen:
+			del timeBar
+			timeBar = progressBar(60)
+		timeBar.update()
+	### if moveMod == 0 or clock.get_fps() == 0:
+	### 	moveMod = 1
+	### else:
+	### 	moveMod = int(globalTick/clock.get_fps())
+	### 	print(moveMod)
 
+	# Update player charater animation
 	charTick += 1
 	if charTick/10 == 1:
 		char = pygame.image.load("assets/char/frame1.png")
@@ -60,19 +77,21 @@ while running:
 		charTick = 0
 
 
-	clock.tick(globalTick)
+	# Update display
+	screen.fill((255, 255, 255))
+	for i in range(len(platforms)):
+		screen.blit(platforms[i].hitbox, platforms[i].PosXY)
+	screen.blit(char, (PosX, PosY))
+	screen.blit(checkpoints[0].hitbox, checkpoints[0].PosXY)
+	screen.blit(regionpoints[0].hitbox, regionpoints[0].PosXY)
+
 	fps = font.render(str("FPS:"), True, (100, 100, 100))
 	fpsNum = font.render(str(int(clock.get_fps())), True, (100,100,100))
 	screen.blit(fps, (50, 50))
 	screen.blit(fpsNum, (100, 50))
 
-	# Update display
+	clock.tick(globalTick)
 	pygame.display.update()
-	screen.fill((255, 255, 255))
-	screen.blit(char, (PosX, PosY))
-	screen.blit(checkpoints[0].hitbox, checkpoints[0].PosXY)
-	for i in range(len(platforms)):
-		screen.blit(platforms[i].hitbox, platforms[i].PosXY)
 
 	# Search for commands
 	for event in pygame.event.get():
@@ -82,6 +101,25 @@ while running:
 		if event.type == KEYDOWN:
 			if event.key == K_ESCAPE:
 				running = False
+
+		# enable fullscreen
+		if event.type == KEYDOWN:
+			if event.key == K_F11:
+				if sFullscreen == False and F11Mode == "enlarge":
+					screen = pygame.display.set_mode((width, 600), FULLSCREEN)
+					pygame.display.update()
+					sFullscreen = True
+					#globalTick = 30
+					#moveMod = clock.get_fps()/globalTick
+				if sFullscreen == True and F11Mode == "shrink":
+					screen = pygame.display.set_mode((800,600))
+					sFullscreen = False
+					globalTick = 40
+					moveMod = 1
+				if sFullscreen == True:
+					F11Mode = "shrink"
+				if sFullscreen == False:
+					F11Mode = "enlarge"
 
 		# Detect for movement commands
 		if event.type == KEYDOWN:
@@ -129,14 +167,16 @@ while running:
 	# must go in opposite direction to player in order for it to work intuitively
 	if left == True:
 		for i in range(len(platforms)):
-			platforms[i].PosXY[0] += 10
-		checkpoints[0].PosXY[0] += 10
-		resetOriginalPos += 10
+			platforms[i].PosXY[0] += 10 * moveMod
+		checkpoints[0].PosXY[0] += 10 * moveMod
+		regionpoints[0].PosXY[0] += 10 * moveMod
+		resetOriginalPos += 10 * moveMod
 	elif right == True:
 		for i in range(len(platforms)):
-			platforms[i].PosXY[0] -= 10
-		checkpoints[0].PosXY[0] -= 10
-		resetOriginalPos -= 10
+			platforms[i].PosXY[0] -= 10 * moveMod
+		checkpoints[0].PosXY[0] -= 10 * moveMod
+		regionpoints[0].PosXY[0] -= 10 * moveMod
+		resetOriginalPos -= 10 * moveMod
 
 	# Jump mechanics
 	if jump == True:
@@ -157,12 +197,14 @@ while running:
 			for i in range(len(platforms)):
 				platforms[i].PosXY[0] -= resetOriginalPos
 			checkpoints[0].PosXY[0] -= resetOriginalPos
+			regionpoints[0].PosXY[0] -= resetOriginalPos
 			resetOriginalPos = 0
 		else:
 			PosX, PosY = int(250), int(0)
 			for i in range(len(platforms)):
 				platforms[i].PosXY[1] -= 600
 			checkpoints[0].PosXY[1] -= 600
+			regionpoints[0].PosXY[1] -= 600
 			levelHeight -= 1
 	# Above
 	if PosY < 0:
@@ -170,27 +212,38 @@ while running:
 		for i in range(len(platforms)):
 			platforms[i].PosXY[1] += 600
 		checkpoints[0].PosXY[1] += 600
+		regionpoints[0].PosXY[1] += 600
 		levelHeight += 1
 
 	# Prevent falling through the floor
 	# Do twice to avoid conflict with gravity
 	for i in range(2):
 		for p in range(len(platforms)):
+			if platforms[p].physicalState == "Solid":
+				lift = 10
+			if platforms[p].physicalState == "Liquid":
+				lift = -4
+			if platforms[p].physicalState == "Gas":
+				lift = 0
 			if collision(char, platforms[p].hitbox, (PosX, PosY), platforms[p].PosXY):
 				if "Above" in relativeLocation(char, platforms[p].hitbox, (PosX, PosY), platforms[p].PosXY):
-					PosY -= 10
+					PosY -= lift
 				if "Below" in relativeLocation(char, platforms[p].hitbox, (PosX, PosY), platforms[p].PosXY):
-					PosY += 10
-				if "Right" in relativeLocation(char, platforms[p].hitbox, (PosX, PosY), platforms[p].PosXY):
-					for i in range(len(platforms)):
-						platforms[i].PosXY[0] += 10
-					checkpoints[0].PosXY[0] += 10
-					resetOriginalPos += 10
-				if "Left" in relativeLocation(char, platforms[p].hitbox, (PosX, PosY), platforms[p].PosXY):
-					for i in range(len(platforms)):
-						platforms[i].PosXY[0] -= 10
-					checkpoints[0].PosXY[0] -= 10
-					resetOriginalPos -= 10
+					PosY += lift
+				if lift == 10:
+					if "Right" in relativeLocation(char, platforms[p].hitbox, (PosX, PosY), platforms[p].PosXY):
+						for i in range(len(platforms)):
+							platforms[i].PosXY[0] += lift
+						checkpoints[0].PosXY[0] += lift
+						regionpoints[0].PosXY[0] += lift
+						resetOriginalPos += lift
+					if "Left" in relativeLocation(char, platforms[p].hitbox, (PosX, PosY), platforms[p].PosXY):
+						for i in range(len(platforms)):
+							platforms[i].PosXY[0] -= lift
+						checkpoints[0].PosXY[0] -= lift
+						regionpoints[0].PosXY[0] -= lift
+						resetOriginalPos -= lift
+
 
 	# Level specific code
 	# Level changer and loading system
@@ -204,10 +257,12 @@ while running:
 			for i in range(len(platforms)):
 				platforms[i].PosXY[0] -= resetOriginalPos
 			checkpoints[0].PosXY[0] -= resetOriginalPos
+			regionpoints[0].PosXY[0] -= resetOriginalPos
 			resetOriginalPos = 0
 			for i in range(len(platforms)):
 				del platforms[0]
 			del checkpoints[0]
+			del regionpoints[0]
 			from levels.testLevel2 import *
 	# launch level 3
 	if level == 3:
@@ -217,10 +272,12 @@ while running:
 			for i in range(len(platforms)):
 				platforms[i].PosXY[0] -= resetOriginalPos
 			checkpoints[0].PosXY[0] -= resetOriginalPos
+			regionpoints[0].PosXY[0] -= resetOriginalPos
 			resetOriginalPos = 0
 			for i in range(len(platforms)):
 				del platforms[0]
 			del checkpoints[0]
+			del regionpoints[0]
 			from levels.testLevel3 import *
 
 		# Custom level code
@@ -245,8 +302,23 @@ while running:
 		if rotatingPlatClock/40 == 1:
 			rotatingPlat.PosXY[0] += 400
 		if rotatingPlatClock/40 == 2:
-			rotatingPlat.PosXY[1] += 300
+			rotatingPlat.PosXY[1] += 200
 		if rotatingPlatClock/40 == 3:
 			rotatingPlat.PosXY[0] -= 400
-			rotatingPlat.PosXY[1] -= 300
+			rotatingPlat.PosXY[1] -= 200
 			rotatingPlatClock = 0
+	if level == 4:
+		if level3Done == False:
+			level3Done = True
+			for i in range(len(platforms)):
+				platforms[i].PosXY[0] -= resetOriginalPos
+			checkpoints[0].PosXY[0] -= resetOriginalPos
+			regionpoints[0].PosXY[0] -= resetOriginalPos
+			resetOriginalPos = 0
+			for i in range(len(platforms)):
+				del platforms[0]
+			del checkpoints[0]
+			del regionpoints[0]
+			from levels.testLevel4 import *
+	if level == 5:
+		running = False
