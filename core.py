@@ -7,8 +7,23 @@ import sys
 platforms = []
 checkpoints = []
 regionpoints = []
+entitys = []
+levelHeight = 0
 
 ## Functions
+def clearLevel(resetOriginalPos):
+	for i in range(len(platforms)):
+		platforms[0].PosXY[0] -= resetOriginalPos
+		del platforms[0]
+	for i in range(len(checkpoints)):
+		checkpoints[0].PosXY[0] -= resetOriginalPos
+		del checkpoints[0]
+	for i in range(len(regionpoints)):
+		regionpoints[0].PosXY[0] -= resetOriginalPos
+		del regionpoints[0]
+	resetOriginalPos = 0
+	return resetOriginalPos
+
 def collision(obj1, obj2, obj1Pos, obj2Pos):
 	# tracks top left corner of obj1 to see if it
 	# collides with anywhere on the top of obj2
@@ -153,3 +168,47 @@ class regionPoint:
 		self.hitbox = pygame.Surface((25, 25))
 		self.Collected = False
 		regionpoints.append(self)
+
+class entity:
+	def __init__(self, PosX, PosY):
+		self.PosXY = [PosX, PosY]
+		self.hitbox = pygame.Surface((25, 25))
+		self.moveDirection = 1
+		self.repellant = self.moveDirection
+		entitys.append(self)
+
+	def update(self):
+		# Gravity
+		if self.PosXY[1] < 610:
+			self.PosXY[1] += 10
+		elif levelHeight == 0:
+			del self
+			return
+		self.PosXY[0] += self.moveDirection
+
+		# for i in range(2):
+		for p in range(len(platforms)):
+			if platforms[p].physicalState == "Solid":
+				lift = 10
+			if platforms[p].physicalState == "Liquid":
+				lift = -4
+			if platforms[p].physicalState == "Gas":
+				lift = 0
+			if collision(self.hitbox, platforms[p].hitbox, self.PosXY, platforms[p].PosXY):
+				if "Above" in relativeLocation(self.hitbox, platforms[p].hitbox, self.PosXY, platforms[p].PosXY):
+					self.PosXY[1] -= lift
+				if "Below" in relativeLocation(self.hitbox, platforms[p].hitbox, self.PosXY, platforms[p].PosXY):
+					self.PosXY[1] += lift
+				if lift == 10:
+					if "Right" in relativeLocation(self.hitbox, platforms[p].hitbox, self.PosXY, platforms[p].PosXY):
+						self.PosXY[0] -= self.repellant
+						self.PosXY[1] -= lift
+						self.moveDirection = -self.repellant
+					if "Left" in relativeLocation(self.hitbox, platforms[p].hitbox, self.PosXY, platforms[p].PosXY):
+						self.PosXY[0] += self.repellant
+						self.PosXY[1] -= lift
+						self.moveDirection = self.repellant
+
+	#
+	#		MOVE DIRECTION IF THERE IS NO PLATFORM BELOW ENTITY
+	#

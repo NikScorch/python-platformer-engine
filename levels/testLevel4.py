@@ -58,6 +58,13 @@ EndWallClimb2 = platform(125, 125, 1950, 25)
 EndWallClimb2.hitbox.fill((255, 255, 255))
 EndWallClimb2.makeLiquid()
 
+# Mobs
+Mob = entity(775, 60)
+Mob = entity(1150, 70)
+Mob = entity(1200, 80)
+Mob = entity(1250, 90)
+Mob = entity(1300, 100)
+
 # Checkpoints
 checkP = checkpoint(1875, 125)
 checkP.hitbox.fill((255, 150, 100))

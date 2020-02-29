@@ -16,7 +16,7 @@ font = pygame.font.Font(None, 30)
 
 ## Variables
 resetOriginalPos = 0
-levelHeight = 0
+
 TotalRP = 0
 timeBar = progressBar(60)
 # Display
@@ -84,14 +84,21 @@ while running:
 		char = pygame.transform.scale(char, (25, 25))
 		charTick = 0
 
+	# Update Entitys
+	for i in range(len(entitys)):
+		entitys[i].update()
 
 	# Update display
 	screen.fill((255, 255, 255))
 	for i in range(len(platforms)):
 		screen.blit(platforms[i].hitbox, platforms[i].PosXY)
+	for i in range(len(entitys)):
+		screen.blit(entitys[i].hitbox, entitys[i].PosXY)
+	for i in range(len(checkpoints)):
+		screen.blit(checkpoints[i].hitbox, checkpoints[i].PosXY)
+	for i in range(len(regionpoints)):
+		screen.blit(regionpoints[i].hitbox, regionpoints[i].PosXY)
 	screen.blit(char, (PosX, PosY))
-	screen.blit(checkpoints[0].hitbox, checkpoints[0].PosXY)
-	screen.blit(regionpoints[0].hitbox, regionpoints[0].PosXY)
 
 	fps = font.render(str("FPS:"), True, (100, 100, 100))
 	fpsNum = font.render(str(int(clock.get_fps())), True, (100, 100, 100))
@@ -105,6 +112,7 @@ while running:
 
 	clock.tick(globalTick)
 	pygame.display.update()
+
 
 	# Search for commands
 	for event in pygame.event.get():
@@ -181,14 +189,22 @@ while running:
 	if left == True:
 		for i in range(len(platforms)):
 			platforms[i].PosXY[0] += 10 * moveMod
-		checkpoints[0].PosXY[0] += 10 * moveMod
-		regionpoints[0].PosXY[0] += 10 * moveMod
+		for i in range(len(entitys)):
+			entitys[i].PosXY[0] += 10 * moveMod
+		for i in range(len(checkpoints)):
+			checkpoints[i].PosXY[0] += 10 * moveMod
+		for i in range(len(regionpoints)):
+			regionpoints[i].PosXY[0] += 10 * moveMod
 		resetOriginalPos += 10 * moveMod
 	elif right == True:
 		for i in range(len(platforms)):
 			platforms[i].PosXY[0] -= 10 * moveMod
-		checkpoints[0].PosXY[0] -= 10 * moveMod
-		regionpoints[0].PosXY[0] -= 10 * moveMod
+		for i in range(len(entitys)):
+			entitys[i].PosXY[0] -= 10 * moveMod
+		for i in range(len(checkpoints)):
+			checkpoints[i].PosXY[0] -= 10 * moveMod
+		for i in range(len(regionpoints)):
+			regionpoints[i].PosXY[0] -= 10 * moveMod
 		resetOriginalPos -= 10 * moveMod
 
 	# Jump mechanics
@@ -209,23 +225,35 @@ while running:
 			PosX, PosY = int(250), int(startY)
 			for i in range(len(platforms)):
 				platforms[i].PosXY[0] -= resetOriginalPos
-			checkpoints[0].PosXY[0] -= resetOriginalPos
-			regionpoints[0].PosXY[0] -= resetOriginalPos
+			for i in range(len(entitys)):
+				entitys[i].PosXY[0] -= resetOriginalPos
+			for i in range(len(checkpoints)):
+				checkpoints[i].PosXY[0] -= resetOriginalPos
+			for i in range(len(regionpoints)):
+				regionpoints[i].PosXY[0] -= resetOriginalPos
 			resetOriginalPos = 0
 		else:
 			PosX, PosY = int(250), int(0)
 			for i in range(len(platforms)):
 				platforms[i].PosXY[1] -= 600
-			checkpoints[0].PosXY[1] -= 600
-			regionpoints[0].PosXY[1] -= 600
+			for i in range(len(entitys)):
+				entitys[i].PosXY[1] -= 600
+			for i in range(len(checkpoints)):
+				checkpoints[i].PosXY[1] -= 600
+			for i in range(len(regionpoints)):
+				regionpoints[i].PosXY[1] -= 600
 			levelHeight -= 1
 	# Above
 	if PosY < 0:
 		PosX, PosY = int(250), int(600)
 		for i in range(len(platforms)):
 			platforms[i].PosXY[1] += 600
-		checkpoints[0].PosXY[1] += 600
-		regionpoints[0].PosXY[1] += 600
+		for i in range(len(entitys)):
+			entitys[i].PosXY[1] += 600
+		for i in range(len(checkpoints)):
+			checkpoints[i].PosXY[1] += 600
+		for i in range(len(regionpoints)):
+			regionpoints[i].PosXY[1] += 600
 		levelHeight += 1
 
 	# Prevent falling through the floor
@@ -247,15 +275,24 @@ while running:
 					if "Right" in relativeLocation(char, platforms[p].hitbox, (PosX, PosY), platforms[p].PosXY):
 						for i in range(len(platforms)):
 							platforms[i].PosXY[0] += lift
-						checkpoints[0].PosXY[0] += lift
-						regionpoints[0].PosXY[0] += lift
+						for i in range(len(entitys)):
+							entitys[i].PosXY[0] += lift
+						for i in range(len(checkpoints)):
+							checkpoints[i].PosXY[0] += lift
+						for i in range(len(regionpoints)):
+							regionpoints[i].PosXY[0] += lift
 						resetOriginalPos += lift
 					if "Left" in relativeLocation(char, platforms[p].hitbox, (PosX, PosY), platforms[p].PosXY):
 						for i in range(len(platforms)):
 							platforms[i].PosXY[0] -= lift
-						checkpoints[0].PosXY[0] -= lift
-						regionpoints[0].PosXY[0] -= lift
+						for i in range(len(entitys)):
+							entitys[i].PosXY[0] -= lift
+						for i in range(len(checkpoints)):
+							checkpoints[i].PosXY[0] -= lift
+						for i in range(len(regionpoints)):
+							regionpoints[i].PosXY[0] -= lift
 						resetOriginalPos -= lift
+
 
 	# Detect new region points and update counter
 	for i in range(len(regionpoints)):
@@ -266,37 +303,22 @@ while running:
 
 	# Level specific code
 	# Level changer and loading system
-	if collision(char, checkpoints[0].hitbox, (PosX, PosY), checkpoints[0].PosXY):
-		level += 1
+	for i in range(len(checkpoints)):
+		if collision(char, checkpoints[i].hitbox, (PosX, PosY), checkpoints[i].PosXY):
+			level += 1
 	# launch level 2
 	if level == 2:
 		# if level 1 isnt completed
 		if level1Done == False:
 			level1Done = True
-			for i in range(len(platforms)):
-				platforms[i].PosXY[0] -= resetOriginalPos
-			checkpoints[0].PosXY[0] -= resetOriginalPos
-			regionpoints[0].PosXY[0] -= resetOriginalPos
-			resetOriginalPos = 0
-			for i in range(len(platforms)):
-				del platforms[0]
-			del checkpoints[0]
-			del regionpoints[0]
+			resetOriginalPos = clearLevel(resetOriginalPos)
 			from levels.testLevel2 import *
 	# launch level 3
 	if level == 3:
 		# if level 2 isnt completed
 		if level2Done == False:
 			level2Done = True
-			for i in range(len(platforms)):
-				platforms[i].PosXY[0] -= resetOriginalPos
-			checkpoints[0].PosXY[0] -= resetOriginalPos
-			regionpoints[0].PosXY[0] -= resetOriginalPos
-			resetOriginalPos = 0
-			for i in range(len(platforms)):
-				del platforms[0]
-			del checkpoints[0]
-			del regionpoints[0]
+			resetOriginalPos = clearLevel(resetOriginalPos)
 			from levels.testLevel3 import *
 
 		# Custom level code
@@ -329,15 +351,7 @@ while running:
 	if level == 4:
 		if level3Done == False:
 			level3Done = True
-			for i in range(len(platforms)):
-				platforms[i].PosXY[0] -= resetOriginalPos
-			checkpoints[0].PosXY[0] -= resetOriginalPos
-			regionpoints[0].PosXY[0] -= resetOriginalPos
-			resetOriginalPos = 0
-			for i in range(len(platforms)):
-				del platforms[0]
-			del checkpoints[0]
-			del regionpoints[0]
+			resetOriginalPos = clearLevel(resetOriginalPos)
 			from levels.testLevel4 import *
 	if level == 5:
 		running = False
