@@ -42,11 +42,18 @@ char = pygame.transform.scale(char, (25, 25))
 PosX, PosY = int(250), int(250)
 charTick = 0
 
+# Pause Menu
+def quitButtonPressed():
+	running = False
+	return running
+quitButton = UIEngine.Button("Quit", quit, (50, 12))
+
 # Levels
 level = 1
 # If level specified use that instead of default
 del sys.argv[0]
 if len(sys.argv) > 0:
+	str(sys.argv[0]).split()
 	import importlib
 	module = importlib.import_module(sys.argv[0])
 else:
@@ -99,6 +106,9 @@ while running:
 	for i in range(len(regionpoints)):
 		screen.blit(regionpoints[i].hitbox, regionpoints[i].PosXY)
 	screen.blit(char, (PosX, PosY))
+	for i in range(len(UIWidgets)):
+		screen.blit(UIWidgets[i].hitbox, UIWidgets[i].PosXY)
+		screen.blit(UIWidgets[i].Text, [UIWidgets[i].PosXY[0] + 5, UIWidgets[i].PosXY[1] + 4])
 
 	fps = font.render(str("FPS:"), True, (100, 100, 100))
 	fpsNum = font.render(str(int(clock.get_fps())), True, (100, 100, 100))
@@ -141,6 +151,12 @@ while running:
 					F11Mode = "shrink"
 				if sFullscreen == False:
 					F11Mode = "enlarge"
+
+		# Detect if mouse has clicked any UI elements
+		if event.type == MOUSEBUTTONUP:
+			for i in range(len(UIWidgets)):
+				if collision(pygame.Surface((0,0)), UIWidgets[i].hitbox, pygame.mouse.get_pos(), UIWidgets[i].PosXY):
+					UIWidgets[i].Function()
 
 		# Detect for movement commands
 		if event.type == KEYDOWN:
@@ -354,4 +370,9 @@ while running:
 			resetOriginalPos = clearLevel(resetOriginalPos)
 			from levels.testLevel4 import *
 	if level == 5:
+		if level4Done == False:
+			level4Done = True
+			resetOriginalPos = clearLevel(resetOriginalPos)
+			from levels.testLevel5 import *
+	if level == 6:
 		running = False

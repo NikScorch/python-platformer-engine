@@ -1,14 +1,14 @@
 @echo off
 echo normal mode
 color 2F
-mode con:cols=60 lines=30
+mode con:cols=60 lines=15
 cls
 
 CALL :header
 
 echo ^
                                                             ^
-               Do you want to run the game?                 ^
+                Do you want to run the game?                ^
                         [yes/no]
 
 set /p id=": "

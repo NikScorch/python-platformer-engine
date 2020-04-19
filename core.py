@@ -8,6 +8,7 @@ platforms = []
 checkpoints = []
 regionpoints = []
 entitys = []
+UIWidgets = []
 levelHeight = 0
 
 ## Functions
@@ -21,6 +22,9 @@ def clearLevel(resetOriginalPos):
 	for i in range(len(regionpoints)):
 		regionpoints[0].PosXY[0] -= resetOriginalPos
 		del regionpoints[0]
+	for i in range(len(entitys)):
+		entitys[0].PosXY[0] -= resetOriginalPos
+		del entitys[0]
 	resetOriginalPos = 0
 	return resetOriginalPos
 
@@ -112,10 +116,10 @@ class progressBar:
 			sys.stdout.write("]") # this ends the progress bar
 
 class platform:
-	def __init__(self, LenX, LenY, PosX, PosY):
+	def __init__(self, LenX, LenY, PosXY):
 		self.LenX = LenX
 		self.LenY = LenY
-		self.PosXY = [PosX, PosY]
+		self.PosXY = [PosXY[0], PosXY[1]]
 		self.hitbox = pygame.Surface((self.LenX, self.LenY))
 		platforms.append(self)
 		self.spriteTick = 0
@@ -157,21 +161,21 @@ class platform:
 			self.hitbox = pygame.transform.scale(self.hitbox, (self.LenX, self.LenY))
 
 class checkpoint:
-	def __init__(self, PosX, PosY):
-		self.PosXY = [PosX, PosY]
+	def __init__(self, PosXY):
+		self.PosXY = [PosXY[0], PosXY[1]]
 		self.hitbox = pygame.Surface((25, 25))
 		checkpoints.append(self)
 
 class regionPoint:
-	def __init__(self, PosX, PosY):
-		self.PosXY = [PosX, PosY]
+	def __init__(self, PosXY):
+		self.PosXY = [PosXY[0], PosXY[1]]
 		self.hitbox = pygame.Surface((25, 25))
 		self.Collected = False
 		regionpoints.append(self)
 
 class entity:
-	def __init__(self, PosX, PosY):
-		self.PosXY = [PosX, PosY]
+	def __init__(self, PosXY):
+		self.PosXY = [PosXY[0], PosXY[1]]
 		self.hitbox = pygame.Surface((25, 25))
 		self.moveDirection = 1
 		self.repellant = self.moveDirection
@@ -212,3 +216,14 @@ class entity:
 	#
 	#		MOVE DIRECTION IF THERE IS NO PLATFORM BELOW ENTITY
 	#
+
+class UIEngine:
+	class Button:
+		def __init__(self, Text, Function, PosXY):
+			font = pygame.font.Font(None, 30)
+			self.TextColour = (255, 255, 255)
+			self.Text = font.render(str(Text), True, self.TextColour)
+			self.PosXY = [PosXY[0], PosXY[1]]
+			self.hitbox = pygame.Surface((font.size(Text)[0] + 10, font.size(Text)[1] + 5))
+			self.Function = Function
+			UIWidgets.append(self)
